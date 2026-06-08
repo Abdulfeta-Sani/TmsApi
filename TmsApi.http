@@ -15,3 +15,8 @@ GET {{TmsApi_HostAddress}}/worker-smoke
 Accept: application/json
 
 ###
+
+GET {{TmsApi_HostAddress}}/test-notfound/abc123
+Accept: application/json
+
+###

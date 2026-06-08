@@ -92,4 +92,32 @@ app.MapGet("/worker-smoke",
     });
 });
 
+// Temporary Verification Endpoint (For Session 2)
+app.MapGet(
+    "/test-duplicate",
+    async (IEnrollmentService service) =>
+{
+    await service.EnrollAsync(
+        "S-001",
+        "CS-101");
+
+    await service.EnrollAsync(
+        "S-001",
+        "CS-101");
+
+    return Results.Ok(
+        "Duplicate test completed");
+});
+
+app.MapGet(
+    "/test-notfound/{id}",
+    async (
+        string id,
+        IEnrollmentService service) =>
+{
+    var result =
+        await service.GetByIdAsync(id);
+
+    return Results.Ok(result);
+});
 app.Run();
