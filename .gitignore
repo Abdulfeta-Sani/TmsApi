@@ -1,0 +1,47 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# ASP.NET generated files
+wwwroot/lib/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+packages/
+
+# Environment files
+.env
+.env.*
+
+# Coverage
+coverage/
+TestResults/
+
+# Publish output
+publish/
+
+# Temporary files
+*.tmp
+*.temp
