@@ -10,3 +10,8 @@ X-Training-User: Abdulfeta
 Accept: application/json
 
 ###
+
+GET {{TmsApi_HostAddress}}/worker-smoke
+Accept: application/json
+
+###

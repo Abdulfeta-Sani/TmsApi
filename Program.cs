@@ -32,6 +32,18 @@ builder.Services
 // Register authorization service
 builder.Services.AddAuthorization();
 
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
+
+builder.Services.AddScoped<IEnrollmentService,
+    EnrollmentService>();
+
+builder.Services.AddSingleton<
+    EnrollmentWorker>();
+
 var app = builder.Build();
 
 app.UseMiddleware<RequestLoggingMiddleware>();
@@ -61,5 +73,17 @@ app.MapGet("/api/assessments/results", () =>
     .RequireAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/worker-smoke",
+    async (EnrollmentWorker worker) =>
+{
+    var count =
+        await worker.SmokeTestAsync();
+
+    return Results.Ok(new
+    {
+        enrollmentsCreated = count
+    });
+});
 
 app.Run();
