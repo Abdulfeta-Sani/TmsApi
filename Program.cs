@@ -1,27 +1,13 @@
 using Microsoft.AspNetCore.Authentication;
 
-// =============== Exercise 1: The Blind Server (Middleware Ordering)
-
-// // Step 1 === The broken Pipeline
-// var builder = WebApplication.CreateBuilder(args);
-// var app = builder.Build();
-// app.UseRouting();
-// app.MapGet("/api/assessments/results", () => Results.Ok(new
-// {
-//     courseCode = "CS-101",
-//     studentId = "S-001",
-//     letterGrade = "A"
-// }));
-// app.UseAuthentication();
-// app.UseAuthorization();
-
-// app.Run();
-
 // Step 2 === Fix the Pipeline
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// register Centralized error formatting
+builder.Services.AddProblemDetails();
 
 // Register authentication service
 builder.Services
@@ -53,6 +39,9 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseExceptionHandler("/error");
@@ -81,15 +70,9 @@ app.MapGet("/api/assessments/results", () =>
 
 app.MapControllers();
 
-app.MapGet("/worker-smoke",
-    async (EnrollmentWorker worker) =>
+app.MapGet("/api/error", () =>
 {
-    var count =
-        await worker.SmokeTestAsync();
-
-    return Results.Ok(new
-    {
-        enrollmentsCreated = count
-    });
+    throw new TmsDatabaseException(
+        "Simulated database failure for ProblemDetails testing");
 });
 app.Run();

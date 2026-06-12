@@ -9,12 +9,6 @@ GET {{TmsApi_HostAddress}}/api/assessments/results
 X-Training-User: Abdulfeta
 Accept: application/json
 
-###
-
-GET {{TmsApi_HostAddress}}/worker-smoke
-Accept: application/json
-
-
 # Module 4 Lab Session 3: Exercise 5: The Enrollment API (Controllers with Real CRUD)
 
 ### 1. GET all enrollments (empty list)
@@ -50,4 +44,8 @@ DELETE {{TmsApi_HostAddress}}/api/enrollments/0acba511
 ### 5. GET deleted enrollment
 # Replace the ID after DELETE
 GET {{TmsApi_HostAddress}}/api/enrollments/0acba511
+Accept: application/json
+
+### 6. ProblemDetails test
+GET {{TmsApi_HostAddress}}/api/error
 Accept: application/json
