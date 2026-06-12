@@ -14,9 +14,40 @@ Accept: application/json
 GET {{TmsApi_HostAddress}}/worker-smoke
 Accept: application/json
 
-###
 
-GET {{TmsApi_HostAddress}}/test-notfound/abc123
+# Module 4 Lab Session 3: Exercise 5: The Enrollment API (Controllers with Real CRUD)
+
+### 1. GET all enrollments (empty list)
+GET {{TmsApi_HostAddress}}/api/enrollments
 Accept: application/json
 
 ###
+
+### 2. POST a new enrollment
+POST {{TmsApi_HostAddress}}/api/enrollments
+Content-Type: application/json
+
+{
+  "studentId": "S-001",
+  "courseCode": "CS-101"
+}
+
+###
+
+### 3. GET created enrollment
+# Replace the ID after POST response
+GET {{TmsApi_HostAddress}}/api/enrollments/0acba511
+Accept: application/json
+
+###
+
+### 4. DELETE the enrollment
+# Replace the ID after POST response
+DELETE {{TmsApi_HostAddress}}/api/enrollments/0acba511
+
+###
+
+### 5. GET deleted enrollment
+# Replace the ID after DELETE
+GET {{TmsApi_HostAddress}}/api/enrollments/0acba511
+Accept: application/json
