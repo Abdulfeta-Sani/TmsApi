@@ -1,3 +1,4 @@
+using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 
 // Step 2 === Fix the Pipeline
@@ -5,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+builder.Services.AddOpenApi();
 
 // register Centralized error formatting
 builder.Services.AddProblemDetails();
@@ -39,7 +42,18 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
+// app.UseExceptionHandler();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+else
+{
+    app.UseExceptionHandler();
+}
+
 app.UseStatusCodePages();
 
 app.UseMiddleware<RequestLoggingMiddleware>();
