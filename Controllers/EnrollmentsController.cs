@@ -36,6 +36,3 @@ public class EnrollmentsController(IEnrollmentService enrollmentService) : Contr
         return deleted ? NoContent() : NotFound();
     }
 }
-
-
-public record CreateEnrollmentRequest(string StudentId, string CourseCode);

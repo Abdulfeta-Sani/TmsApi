@@ -28,11 +28,11 @@ builder.Host.UseDefaultServiceProvider(options =>
 });
 
 // builder.Services.AddScoped<IEnrollmentService,
-builder.Services.AddSingleton<IEnrollmentService,
-    EnrollmentService>();
+builder.Services.AddSingleton<IEnrollmentService, EnrollmentService>();
+builder.Services.AddSingleton<IStudentService, StudentService>();
+builder.Services.AddSingleton<ICourseService, CourseService>();
 
-builder.Services.AddSingleton<
-    EnrollmentWorker>();
+builder.Services.AddSingleton<EnrollmentWorker>();
 
 builder.Services
     .AddOptions<PaymentOptions>()
