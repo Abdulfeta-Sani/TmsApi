@@ -51,3 +51,24 @@ Accept: application/json
 ### 6. ProblemDetails test
 GET {{TmsApi_HostAddress}}/api/error
 Accept: application/json
+
+
+### 
+GET {{TmsApi_HostAddress}}/api/test/deferred
+###
+GET {{TmsApi_HostAddress}}/api/test/translation-fail
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/active-students-count
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/course-enrollments
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/average-gpa-per-course
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/students-without-enrollments-a
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/students-without-enrollments-b
