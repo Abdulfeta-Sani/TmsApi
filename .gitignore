@@ -1,47 +1,104 @@
-# Build results
+# =========================
+# Build output
+# =========================
 bin/
 obj/
+publish/
 
+# =========================
 # User-specific files
+# =========================
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
 
-# Visual Studio Code
-.vscode/
-
+# =========================
 # Visual Studio
+# =========================
 .vs/
 
-# Rider
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# JetBrains Rider
+# =========================
 .idea/
 
+# =========================
 # Logs
+# =========================
 *.log
+logs/
 
+# =========================
 # ASP.NET generated files
+# =========================
 wwwroot/lib/
 
+# =========================
 # OS files
+# =========================
 .DS_Store
 Thumbs.db
 
+# =========================
 # NuGet
+# =========================
 *.nupkg
 packages/
 
-# Environment files
+# =========================
+# Environment variables
+# =========================
 .env
 .env.*
 
-# Coverage
+# =========================
+# Secrets
+# =========================
+appsettings.Development.json
+secrets.json
+
+# =========================
+# Coverage reports
+# =========================
 coverage/
 TestResults/
+*.coverage
+*.coveragexml
 
-# Publish output
-publish/
-
+# =========================
 # Temporary files
+# =========================
 *.tmp
 *.temp
+
+# =========================
+# Database files 
+# =========================
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# EF Core generated SQL scripts
+# =========================
+*.sql
+
+# =========================
+# Node modules 
+# =========================
+node_modules/
+
+# =========================
+# Azure / publish profiles
+# =========================
+*.publishsettings
+*.pubxml
+*.pubxml.user
