@@ -16,12 +16,16 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
         builder.Property(e => e.CourseId)
             .IsRequired();
 
+        // Prevent deleting a student if there are enrollments associated with it
         builder.HasOne(e => e.Student)
             .WithMany(s => s.Enrollments)
-            .HasForeignKey(e => e.StudentId);
+            .HasForeignKey(e => e.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
 
+        // prevent deleting a course if there are enrollments associated with it
         builder.HasOne(e => e.Course)
             .WithMany(c => c.Enrollments)
-            .HasForeignKey(e => e.CourseId);
+            .HasForeignKey(e => e.CourseId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
