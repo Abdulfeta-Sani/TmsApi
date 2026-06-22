@@ -72,3 +72,12 @@ GET {{TmsApi_HostAddress}}/api/reports/students-without-enrollments-a
 
 ###
 GET {{TmsApi_HostAddress}}/api/reports/students-without-enrollments-b
+
+###
+Get {{TmsApi_HostAddress}}/api/reports/students
+
+###
+Get {{TmsApi_HostAddress}}/api/reports/students?page=2
+
+###
+Get {{TmsApi_HostAddress}}/api/reports/top-courses
