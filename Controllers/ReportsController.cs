@@ -118,4 +118,28 @@ public class ReportsController(TmsDbContext context) : ControllerBase
 
         return Ok(courses);
     }
+
+    // Intentionally creating the bad pattern N+1
+    [HttpGet("n-plus-one-demo")]
+    public async Task<IActionResult> NPlusOneDemo(
+        CancellationToken cancellationToken = default)
+    {
+        var students = await context.Students
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        foreach (var s in students)
+        {
+            var count = await context.Enrollments
+                .AsNoTracking()
+                .CountAsync(
+                    e => e.StudentId == s.Id,
+                    cancellationToken);
+
+            Console.WriteLine(
+                $"{s.Name}: {count} enrollments");
+        }
+
+        return Ok("Check SQL logs");
+    }
 }
