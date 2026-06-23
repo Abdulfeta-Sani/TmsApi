@@ -84,3 +84,6 @@ Get {{TmsApi_HostAddress}}/api/reports/top-courses
 
 ###
 GET {{TmsApi_HostAddress}}/api/reports/n-plus-one-demo
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/n-plus-one-fixed

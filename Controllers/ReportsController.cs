@@ -142,4 +142,27 @@ public class ReportsController(TmsDbContext context) : ControllerBase
 
         return Ok("Check SQL logs");
     }
+
+    // Fix N+1 with query shaping
+    [HttpGet("n-plus-one-fixed")]
+    public async Task<IActionResult> NPlusOneFixed(
+        CancellationToken cancellationToken = default)
+    {
+        var report = await context.Students
+            .AsNoTracking()
+            .Select(s => new
+            {
+                s.Name,
+                EnrollmentCount = s.Enrollments.Count
+            })
+            .ToListAsync(cancellationToken);
+
+        foreach (var r in report)
+        {
+            Console.WriteLine(
+                $"{r.Name}: {r.EnrollmentCount} enrollments");
+        }
+
+        return Ok(report);
+    }
 }
