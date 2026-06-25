@@ -20,5 +20,8 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 
         builder.Property(s => s.GPA)
             .HasPrecision(4, 2);
+
+        builder.Property<DateTime>("LastUpdated")
+            .HasColumnType("timestamp without time zone");   
     }
 }
