@@ -76,6 +76,7 @@ TestResults/
 # =========================
 *.tmp
 *.temp
+lab_sessions_docs
 
 # =========================
 # Database files 

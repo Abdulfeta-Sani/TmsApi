@@ -87,3 +87,28 @@ GET {{TmsApi_HostAddress}}/api/reports/n-plus-one-demo
 
 ###
 GET {{TmsApi_HostAddress}}/api/reports/n-plus-one-fixed
+
+###
+GET {{TmsApi_HostAddress}}/api/reports/concurrency-demo/1
+
+###
+# CONCURRENCY TEST: Tab A - First update (should succeed)
+PUT {{TmsApi_HostAddress}}/api/reports/concurrency-demo/1
+Content-Type: application/json
+
+{
+  "name": "Alice Smith Updated",
+  "gpa": 3.80,
+  "version": 781
+}
+
+###
+# CONCURRENCY TEST: Tab B - Second update with stale version (should fail with 409)
+PUT {{TmsApi_HostAddress}}/api/reports/concurrency-demo/1
+Content-Type: application/json
+
+{
+  "name": "Alice Smith",
+  "gpa": 4.00,
+  "version": 781
+}

@@ -6,13 +6,13 @@ namespace TmsApi.Controllers;
 
 [ApiController]
 [Route("api/reports")]
-public class ReportsController(TmsDbContext context) : ControllerBase
+public class ReportsController(TmsDbContext db) : ControllerBase
 {
     // active students have GPA >= 3.0
     [HttpGet("active-students-count")]
     public async Task<IActionResult> ActiveStudentsCount()
     {
-        var count = await context.Students
+        var count = await db.Students
             .Where(s => s.IsActive && s.GPA >= 3.0m)
             .CountAsync();
 
@@ -26,7 +26,7 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     [HttpGet("course-enrollments")]
     public async Task<IActionResult> CourseEnrollments()
     {
-        var list = await context.Courses
+        var list = await db.Courses
             .Select(c => new
             {
                 c.Title,
@@ -42,7 +42,7 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     [HttpGet("average-gpa-per-course")]
     public async Task<IActionResult> AverageGpaPerCourse()
     {
-        var list = await context.Enrollments
+        var list = await db.Enrollments
             .GroupBy(e => e.Course.Title)
             .Select(g => new
             {
@@ -58,7 +58,7 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     [HttpGet("students-without-enrollments-a")]
     public async Task<IActionResult> StudentsWithoutEnrollmentsA()
     {
-        var list = await context.Students
+        var list = await db.Students
             .Where(s => !s.Enrollments.Any())
             .Select(s => s.Name)
             .ToListAsync();
@@ -70,9 +70,9 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     [HttpGet("students-without-enrollments-b")]
     public async Task<IActionResult> StudentsWithoutEnrollmentsB()
     {
-        var list = await context.Students
+        var list = await db.Students
             .LeftJoin(
-                context.Enrollments,
+                db.Enrollments,
                 s => s.Id,
                 e => e.StudentId,
                 (s, e) => new { s, e })
@@ -91,7 +91,7 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     {
         const int pageSize = 20;
 
-        var students = await context.Students
+        var students = await db.Students
             .OrderBy(s => s.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -105,7 +105,7 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     public async Task<IActionResult> GetTopCourses(
         CancellationToken cancellationToken = default)
     {
-        var courses = await context.Enrollments
+        var courses = await db.Enrollments
             .GroupBy(e => e.Course.Title)
             .Select(g => new
             {
@@ -124,13 +124,13 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     public async Task<IActionResult> NPlusOneDemo(
         CancellationToken cancellationToken = default)
     {
-        var students = await context.Students
+        var students = await db.Students
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
         foreach (var s in students)
         {
-            var count = await context.Enrollments
+            var count = await db.Enrollments
                 .AsNoTracking()
                 .CountAsync(
                     e => e.StudentId == s.Id,
@@ -148,7 +148,7 @@ public class ReportsController(TmsDbContext context) : ControllerBase
     public async Task<IActionResult> NPlusOneFixed(
         CancellationToken cancellationToken = default)
     {
-        var report = await context.Students
+        var report = await db.Students
             .AsNoTracking()
             .Select(s => new
             {
@@ -164,5 +164,67 @@ public class ReportsController(TmsDbContext context) : ControllerBase
         }
 
         return Ok(report);
+    }
+
+    [HttpGet("concurrency-demo/{id:int}")]
+    public async Task<IActionResult> GetStudentForConcurrencyDemo(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var student = await db.Students
+            .AsNoTracking()
+            .Where(s => s.Id == id)
+            .Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.GPA,
+                s.Version
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return student is null
+            ? NotFound()
+            : Ok(student);
+    }
+
+    [HttpPut("concurrency-demo/{id:int}")]
+    public async Task<IActionResult> UpdateStudentConcurrencyDemo(
+        int id,
+        [FromBody] UpdateStudentRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        // Step 1: Load the student from the database
+        var student = await db.Students
+            .SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
+
+        // Step 2: If student doesn't exist, return 404 Not Found
+        if (student is null)
+            return NotFound();
+
+        // Step 3: Tell EF what the original Version was and check for concurrency conflicts
+        db.Entry(student)
+            .Property(s => s.Version)
+            .OriginalValue = request.Version;
+
+        // Step 4: Update the student's properties
+        student.Name = request.Name;
+        student.GPA = request.GPA;
+
+        // Step 5: Try to save
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+            return Ok(new { message = "Student updated successfully", student });
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Step 6: If concurrency conflict, return 409 Conflict
+            return Conflict(new 
+            { 
+                error = "Concurrency conflict",
+                message = "Another user modified this student. Please reload and try again.",
+            });
+        }
     }
 }
