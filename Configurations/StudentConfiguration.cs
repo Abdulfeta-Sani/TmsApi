@@ -25,6 +25,8 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .IsRowVersion();
 
         builder.Property<DateTime>("LastUpdated")
-            .HasColumnType("timestamp without time zone");   
+            .HasColumnType("timestamp without time zone");
+
+        builder.HasQueryFilter(s => !s.IsDeleted);
     }
 }

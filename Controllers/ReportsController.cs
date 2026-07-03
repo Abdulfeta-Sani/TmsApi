@@ -227,4 +227,61 @@ public class ReportsController(TmsDbContext db) : ControllerBase
             });
         }
     }
+
+    // Demonstrate the query filter — Normal query
+    [HttpGet("students-active")]
+    public async Task<IActionResult> GetActiveStudents(
+        CancellationToken cancellationToken = default)
+    {
+        var students = await db.Students
+            .AsNoTracking()
+            .Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.IsDeleted
+            })
+            .ToListAsync(cancellationToken);
+
+        return Ok(students);
+    }
+
+    // Demonstrate the query filter — Admin query
+    [HttpGet("students-admin")]
+    public async Task<IActionResult> GetAllStudentsForAdmin(
+        CancellationToken cancellationToken = default)
+    {
+        var students = await db.Students
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.IsDeleted
+            })
+            .ToListAsync(cancellationToken);
+
+        return Ok(students);
+    }
+
+    [HttpPost("archive-old-enrollments")]
+    public async Task<IActionResult> ArchiveOldEnrollments(
+        CancellationToken cancellationToken = default)
+    {
+        var cutoff = DateTime.UtcNow.AddDays(-7);
+
+        var affectedRows = await db.Enrollments
+            .Where(e => e.EnrolledAt < cutoff)
+            .ExecuteUpdateAsync(
+                s => s.SetProperty(
+                    e => e.IsArchived,
+                    true),
+                cancellationToken);
+
+        return Ok(new
+        {
+            ArchivedEnrollments = affectedRows
+        });
+    }
 }

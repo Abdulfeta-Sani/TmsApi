@@ -112,3 +112,6 @@ Content-Type: application/json
   "gpa": 4.00,
   "version": 781
 }
+
+###
+POST {{TmsApi_HostAddress}}/api/reports/archive-old-enrollments
