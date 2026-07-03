@@ -16,9 +16,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 
 // Register authentication service
-builder.Services
-    .AddAuthentication("Training")
-    .AddScheme<AuthenticationSchemeOptions,
+builder.Services.AddAuthentication("Training").AddScheme<AuthenticationSchemeOptions,
         TrainingAuthHandler>("Training", null);
 
 // Register authorization service
@@ -37,11 +35,7 @@ builder.Services.AddSingleton<ICourseService, CourseService>();
 
 builder.Services.AddSingleton<EnrollmentWorker>();
 
-builder.Services
-    .AddOptions<PaymentOptions>()
-    .BindConfiguration("Payments")
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+builder.Services.AddOptions<PaymentOptions>().BindConfiguration("Payments").ValidateDataAnnotations().ValidateOnStart();
 
 // Register TmsDbContext scoped for incoming HTTP requests
 builder.Services.AddDbContext<TmsDbContext>(options =>
@@ -51,16 +45,10 @@ builder.Services.AddDbContext<TmsDbContext>(options =>
 
 var app = builder.Build();
 
-// app.UseExceptionHandler();
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
-}
-else
-{
-    app.UseExceptionHandler();
 }
 
 app.UseStatusCodePages();
@@ -122,9 +110,9 @@ using (var scope = app.Services.CreateScope())
 
         var courses = new List<Course>
         {
-            new() { Code = "CS-101", Title = "Introduction to Computer Science", Capacity = 30 },
-            new() { Code = "CS-201", Title = "Data Structures and Algorithms", Capacity = 25 },
-            new() { Code = "MAT-101", Title = "Calculus I", Capacity = 40 }
+            new() { Code = "CS-101", Title = "Introduction to Computer Science", MaxCapacity = 30 },
+            new() { Code = "CS-201", Title = "Data Structures and Algorithms", MaxCapacity = 25 },
+            new() { Code = "MAT-101", Title = "Calculus I", MaxCapacity = 40 }
         };
 
         context.Courses.AddRange(courses);
