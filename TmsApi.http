@@ -132,3 +132,37 @@ GET {{TmsApi_HostAddress}}/api/courses/4
 ###
 # test a non-existent course
 GET {{TmsApi_HostAddress}}/api/courses/9999
+
+###
+# Test 1 — Empty Request
+POST {{TmsApi_HostAddress}}/api/courses
+Content-Type: application/json
+
+{}
+
+###
+# Test 2 — Invalid Values
+POST {{TmsApi_HostAddress}}/api/courses
+Content-Type: application/json
+
+{
+  "code": "abc",
+  "title": "x",
+  "maxCapacity": 9999
+}
+
+###
+# Test 3 — Valid Request
+POST {{TmsApi_HostAddress}}/api/courses
+Content-Type: application/json
+
+{
+  "code": "CSE-102",
+  "title": "TypeScript Essentials",
+  "maxCapacity": 25
+}
+
+###
+# Test 4 — GET the created course
+GET {{TmsApi_HostAddress}}/api/courses/
+Accept: application/json
