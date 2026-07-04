@@ -164,5 +164,54 @@ Content-Type: application/json
 
 ###
 # Test 4 — GET the created course
-GET {{TmsApi_HostAddress}}/api/courses/
+GET {{TmsApi_HostAddress}}/api/courses/5
 Accept: application/json
+
+###
+# Test 1 — Duplicate Course Code
+POST {{TmsApi_HostAddress}}/api/courses
+Content-Type: application/json
+
+{
+  "code": "CSE-101",
+  "title": "Duplicate Course",
+  "maxCapacity": 30
+}
+
+###
+# Test 2 — Create a Course with Capacity 1
+POST {{TmsApi_HostAddress}}/api/courses
+Content-Type: application/json
+
+{
+  "code": "CSE-103",
+  "title": "Advanced REST APIs",
+  "maxCapacity": 1
+}
+
+###
+# Test 3 — First Enrollment
+POST {{TmsApi_HostAddress}}/api/courses/6/enrollments
+Content-Type: application/json
+
+{
+  "studentId": 1
+}
+
+###
+# Test 4 — Enroll Again
+POST {{TmsApi_HostAddress}}/api/courses/6/enrollments
+Content-Type: application/json
+
+{
+  "studentId": 1
+}
+
+###
+# Test 5 — Missing Course
+POST {{TmsApi_HostAddress}}/api/courses/9999/enrollments
+Content-Type: application/json
+
+{
+  "studentId": 1
+}
