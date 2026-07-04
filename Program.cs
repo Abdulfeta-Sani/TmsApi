@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using TmsApi.Data;
 using TmsApi.Entities;
+using TmsApi.Services;
 
 // Step 2 === Fix the Pipeline
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +32,7 @@ builder.Host.UseDefaultServiceProvider(options =>
 // builder.Services.AddScoped<IEnrollmentService,
 builder.Services.AddSingleton<IEnrollmentService, EnrollmentService>();
 builder.Services.AddSingleton<IStudentService, StudentService>();
-builder.Services.AddSingleton<ICourseService, CourseService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services.AddSingleton<EnrollmentWorker>();
 

@@ -1,58 +1,29 @@
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using TmsApi.Data;
+using TmsApi.Entities;
 
-public interface ICourseService
+namespace TmsApi.Services;
+
+public class CourseService(TmsDbContext context,
+             ILogger<CourseService> logger): ICourseService
 {
-    Task<CourseRecord> CreateAsync(string code, string title, string? description);
-    Task<CourseRecord?> GetByIdAsync(string id);
-    Task<IReadOnlyList<CourseRecord>> GetAllAsync();
-    Task<bool> DeleteAsync(string id);
-}
-
-public class CourseService : ICourseService
-{
-    private readonly Dictionary<string, CourseRecord> _store = new();
-    private readonly ILogger<CourseService> _logger;
-
-    public CourseService(ILogger<CourseService> logger) => _logger = logger;
-
-    public Task<CourseRecord> CreateAsync(string code, string title, string? description)
+    public async Task<Course?> GetByIdAsync(int id,CancellationToken ct)
     {
-        var existing = _store.Values.FirstOrDefault(c => c.Code == code);
-        if (existing is not null)
-        {
-            _logger.LogWarning("Duplicate course create attempt for {Code} (id {CourseId})", code, existing.Id);
-            return Task.FromResult(existing);
-        }
-
-        var id = Guid.NewGuid().ToString("N")[..8];
-        var record = new CourseRecord(id, code, title, description ?? string.Empty, DateTime.UtcNow);
-        _store[id] = record;
-
-        _logger.LogInformation("Created course {Code} id {CourseId}", code, id);
-        return Task.FromResult(record);
+        return await context.Courses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
-    public Task<CourseRecord?> GetByIdAsync(string id)
+    public async Task<Course> CreateAsync(Course course,CancellationToken ct)
     {
-        _store.TryGetValue(id, out var record);
-        if (record is null) _logger.LogWarning("Course {CourseId} not found", id);
-        return Task.FromResult(record);
-    }
+        context.Courses.Add(course);
 
-    public Task<IReadOnlyList<CourseRecord>> GetAllAsync()
-    {
-        IReadOnlyList<CourseRecord> all = _store.Values.ToList();
-        return Task.FromResult(all);
-    }
+        await context.SaveChangesAsync(ct);
 
-    public Task<bool> DeleteAsync(string id)
-    {
-        var removed = _store.Remove(id);
-        if (removed) _logger.LogInformation("Deleted course {CourseId}", id);
-        else _logger.LogWarning("Delete failed course {CourseId} not found", id);
-        return Task.FromResult(removed);
+        logger.LogInformation("Created course {CourseCode} with ID {CourseId}",
+        course.Code,
+        course.Id);
+
+        return course;
     }
 }
-
-public record CourseRecord(string Id, string Code, string Title, string Description, DateTime CreatedAt);
-public record CreateCourseRequest(string Code, string Title, string? Description);

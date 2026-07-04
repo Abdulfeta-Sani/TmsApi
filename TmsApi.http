@@ -115,3 +115,20 @@ Content-Type: application/json
 
 ###
 POST {{TmsApi_HostAddress}}/api/reports/archive-old-enrollments
+
+###
+POST {{TmsApi_HostAddress}}/api/courses
+Content-Type: application/json
+
+{
+  "code": "CSE-101",
+  "title": "Web Development Fundamentals",
+  "maxCapacity": 30
+}
+
+###
+GET {{TmsApi_HostAddress}}/api/courses/4
+
+###
+# test a non-existent course
+GET {{TmsApi_HostAddress}}/api/courses/9999

@@ -1,24 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
+using TmsApi.Entities;
+using TmsApi.Services;
+
+namespace TmsApi.Controllers;
 
 [ApiController]
 [Route("api/courses")]
 public class CoursesController(ICourseService courseService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await courseService.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(string id) =>
-        (await courseService.GetByIdAsync(id)) is CourseRecord r ? Ok(r) : NotFound();
-
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateCourseRequest req)
+    [HttpGet("{id:int}", Name = nameof(GetCourseById))]
+    public async Task<IActionResult> GetCourseById(
+        int id,
+        CancellationToken ct)
     {
-        var c = await courseService.CreateAsync(req.Code, req.Title, req.Description);
-        return CreatedAtAction(nameof(GetById), new { id = c.Id }, c);
+        var course = await courseService.GetByIdAsync(id, ct);
+
+        return course is not null
+            ? Ok(course)
+            : NotFound();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(string id) =>
-        await courseService.DeleteAsync(id) ? NoContent() : NotFound();
+    [HttpPost]
+    public async Task<IActionResult> CreateCourse(
+        Course course,
+        CancellationToken ct)
+    {
+        var result = await courseService.CreateAsync(course, ct);
+
+        return CreatedAtAction(
+            nameof(GetCourseById),
+            new { id = result.Id },
+            result);
+    }
 }
