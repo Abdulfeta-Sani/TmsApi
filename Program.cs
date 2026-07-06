@@ -2,6 +2,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using TmsApi.Data;
 using TmsApi.Services;
+using TmsApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,11 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("TmsDatabase")));
 
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
-builder.Services.AddControllers();
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<AuditLogFilter>();
+});
 
 var app = builder.Build();
 
