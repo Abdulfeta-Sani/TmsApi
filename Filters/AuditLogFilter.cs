@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TmsApi.Filters;
 
-public class AuditLogFilter(ILogger<AuditLogFilter> logger) : IActionFilter
+public class AuditLogFilter(ILogger<AuditLogFilter> logger) : IActionFilter, IResultFilter
 {
     public void OnActionExecuting(ActionExecutingContext context)
     {
@@ -12,7 +12,15 @@ public class AuditLogFilter(ILogger<AuditLogFilter> logger) : IActionFilter
         logger.LogInformation("TMS API call: {Method} {Route}", method, route);
     }
 
-    public void OnActionExecuted(ActionExecutedContext context)
+        public void OnActionExecuted(ActionExecutedContext context)
+    {
+    }
+
+        public void OnResultExecuting(ResultExecutingContext context)
+    {
+    }
+
+    public void OnResultExecuted(ResultExecutedContext context)
     {
         var status = context.HttpContext.Response.StatusCode;
 
