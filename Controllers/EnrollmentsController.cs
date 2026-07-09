@@ -6,16 +6,28 @@ namespace TmsApi.Controllers;
 
 [ApiController]
 [Route("api/courses/{courseId:int}/enrollments")]
-public class EnrollmentsController(
-    ICourseService courseService,
-    IEnrollmentService enrollmentService)
-    : ControllerBase
+public class EnrollmentsController(ICourseService courseService, IEnrollmentService enrollmentService) : ControllerBase
 {
+    [HttpGet(Name = "ListCourseEnrollments")]
+    public async Task<IActionResult> GetEnrollments(int courseId, CancellationToken ct)
+    {
+        // Confirm the parent course exists.
+        var course = await courseService.GetByIdAsync(courseId, ct);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        // Return all enrollments for the course.
+        var enrollments =
+            await enrollmentService.GetByCourseAsync(courseId, ct);
+
+        return Ok(enrollments);
+    }
+
     [HttpGet("{id:int}", Name = nameof(GetEnrollment))]
-    public async Task<IActionResult> GetEnrollment(
-        int courseId,
-        int id,
-        CancellationToken ct)
+    public async Task<IActionResult> GetEnrollment(int courseId, int id, CancellationToken ct)
     {
         var enrollment =
             await enrollmentService.GetByIdAsync(courseId, id, ct);
@@ -26,10 +38,7 @@ public class EnrollmentsController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> EnrollStudent(
-        int courseId,
-        EnrollStudentRequest request,
-        CancellationToken ct)
+    public async Task<IActionResult> EnrollStudent(int courseId, EnrollStudentRequest request, CancellationToken ct)
     {
         // Step 1: Does the course exist?
         var course = await courseService.GetByIdAsync(courseId, ct);

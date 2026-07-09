@@ -5,15 +5,9 @@ using TmsApi.Entities;
 
 namespace TmsApi.Services;
 
-public class EnrollmentService(
-    TmsDbContext context,
-    ILogger<EnrollmentService> logger)
-    : IEnrollmentService
+public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> logger) : IEnrollmentService
 {
-    public Task<EnrollmentResponseDto?> GetByIdAsync(
-        int courseId,
-        int id,
-        CancellationToken ct)
+    public Task<EnrollmentResponseDto?> GetByIdAsync(int courseId, int id, CancellationToken ct)
         =>
         context.Enrollments
             .AsNoTracking()
@@ -28,10 +22,20 @@ public class EnrollmentService(
                     e.EnrolledAt))
             .FirstOrDefaultAsync(ct);
 
-    public async Task<EnrollmentResponseDto> CreateAsync(
-        int courseId,
-        EnrollStudentRequest request,
-        CancellationToken ct)
+    public async Task<IReadOnlyList<EnrollmentResponseDto>> GetByCourseAsync(int courseId, CancellationToken ct)
+    {
+        return await context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.CourseId == courseId)
+            .Select(e => new EnrollmentResponseDto(
+                e.Id,
+                e.CourseId,
+                e.StudentId,
+                e.EnrolledAt))
+            .ToListAsync(ct);
+    }
+
+    public async Task<EnrollmentResponseDto> CreateAsync(int courseId, EnrollStudentRequest request, CancellationToken ct)
     {
         var enrollment = new Enrollment
         {

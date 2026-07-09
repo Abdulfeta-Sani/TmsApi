@@ -10,9 +10,7 @@ namespace TmsApi.Controllers;
 public class CoursesController(ICourseService courseService, LinkGenerator linkGenerator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetCourses(
-        [FromQuery] PagedRequest request,
-        CancellationToken ct)
+    public async Task<IActionResult> GetCourses([FromQuery] PagedRequest request, CancellationToken ct)
     {
         var result = await courseService.GetCoursesAsync(request, ct);
 
@@ -37,12 +35,11 @@ public class CoursesController(ICourseService courseService, LinkGenerator linkG
             nameof(GetCourseById),
             new { id })!;
 
-        // Build the enrollments collection route, using GetPathByAction()
-        var enrollmentsLink = linkGenerator.GetPathByAction(
+        // Build the enrollments collection route, using GetPathByName()
+        var enrollmentsLink = linkGenerator.GetPathByName(
             HttpContext,
-            action: "GetEnrollments",
-            controller: "Enrollments",
-            values: new { courseId = id })!;
+            "ListCourseEnrollments",
+            new { courseId = id })!;
 
 
         // Build the HATEOAS links.
