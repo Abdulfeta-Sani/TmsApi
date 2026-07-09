@@ -22,9 +22,60 @@ public class CoursesController(ICourseService courseService, LinkGenerator linkG
     [HttpGet("{id:int}", Name = nameof(GetCourseById))]
     public async Task<IActionResult> GetCourseById(int id, CancellationToken ct)
     {
+        // Retrieve the course from the service layer.
         var course = await courseService.GetByIdAsync(id, ct);
 
-        return course is not null ? Ok(course) : NotFound();
+        // Return 404 if the course does not exist.
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        // Build the "self" route using the route name.
+        var selfLink = linkGenerator.GetPathByName(
+            HttpContext,
+            nameof(GetCourseById),
+            new { id })!;
+
+        // Build the enrollments collection route, using GetPathByAction()
+        var enrollmentsLink = linkGenerator.GetPathByAction(
+            HttpContext,
+            action: "GetEnrollments",
+            controller: "Enrollments",
+            values: new { courseId = id })!;
+
+
+        // Build the HATEOAS links.
+        var links = new List<LinkDto>
+        {
+            new(selfLink, "self", "GET"),
+            new(selfLink, "update", "PUT"),
+            new(selfLink, "delete", "DELETE"),
+            new(enrollmentsLink, "enrollments", "GET")
+        };
+
+        // Only expose the "enroll" action if the course still has remaining capacity.
+        if (course.EnrollmentCount < course.MaxCapacity)
+        {
+            links.Add(
+                new LinkDto(
+                    enrollmentsLink,
+                    "enroll",
+                    "POST"));
+        }
+
+        // Build the detail DTO.
+        var detail = new CourseDetailDto
+        {
+            Id = course.Id,
+            Code = course.Code,
+            Title = course.Title,
+            MaxCapacity = course.MaxCapacity,
+            EnrollmentCount = course.EnrollmentCount,
+            Links = links
+        };
+
+        return Ok(detail);
     }
 
     [HttpPost]
