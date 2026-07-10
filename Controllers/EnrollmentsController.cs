@@ -6,12 +6,19 @@ namespace TmsApi.Controllers;
 
 [ApiController]
 [Route("api/courses/{courseId:int}/enrollments")]
+[Tags("Enrollments")]
+[Produces("application/json")]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+
 public class EnrollmentsController(ICourseService courseService, IEnrollmentService enrollmentService) : ControllerBase
 {
     [HttpGet(Name = "ListCourseEnrollments")]
+    [ProducesResponseType(typeof(IReadOnlyList<EnrollmentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("List enrolments for a course")]   
+
     public async Task<IActionResult> GetEnrollments(int courseId, CancellationToken ct)
     {
-        // Confirm the parent course exists.
         var course = await courseService.GetByIdAsync(courseId, ct);
 
         if (course is null)
@@ -19,7 +26,6 @@ public class EnrollmentsController(ICourseService courseService, IEnrollmentServ
             return NotFound();
         }
 
-        // Return all enrollments for the course.
         var enrollments =
             await enrollmentService.GetByCourseAsync(courseId, ct);
 
@@ -27,6 +33,10 @@ public class EnrollmentsController(ICourseService courseService, IEnrollmentServ
     }
 
     [HttpGet("{id:int}", Name = nameof(GetEnrollment))]
+    [ProducesResponseType(typeof(EnrollmentResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [EndpointSummary("Get one enrolment for a course")]
+
     public async Task<IActionResult> GetEnrollment(int courseId, int id, CancellationToken ct)
     {
         var enrollment =
@@ -37,10 +47,16 @@ public class EnrollmentsController(ICourseService courseService, IEnrollmentServ
             : NotFound();
     }
 
-    [HttpPost]
+[HttpPost]
+[ProducesResponseType(typeof(EnrollmentResponseDto), StatusCodes.Status201Created)]
+[ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+[EndpointSummary("Enrol a student in a course")]
+[EndpointDescription("Returns 404 if the course does not exist, 409 if the course has reached MaxCapacity.")]
+
     public async Task<IActionResult> EnrollStudent(int courseId, EnrollStudentRequest request, CancellationToken ct)
     {
-        // Step 1: Does the course exist?
         var course = await courseService.GetByIdAsync(courseId, ct);
 
         if (course is null)
@@ -48,7 +64,6 @@ public class EnrollmentsController(ICourseService courseService, IEnrollmentServ
             return NotFound();
         }
 
-        // Step 2: Is the course already full?
         if (course.EnrollmentCount >= course.MaxCapacity)
         {
             return Conflict(new ProblemDetails
@@ -60,11 +75,9 @@ public class EnrollmentsController(ICourseService courseService, IEnrollmentServ
             });
         }
 
-        // Step 3: Create the enrollment
         var enrollment =
             await enrollmentService.CreateAsync(courseId, request, ct);
 
-        // Step 4: Return 201 Created
         return CreatedAtAction(
             nameof(GetEnrollment),
             new
