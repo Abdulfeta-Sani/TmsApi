@@ -14,6 +14,7 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("TmsDatabase")));
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 
 builder.Services.AddControllers(options =>
 {
