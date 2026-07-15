@@ -11,6 +11,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<TmsDbContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("TmsDatabase")));
 
+builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 
