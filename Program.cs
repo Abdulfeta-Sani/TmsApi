@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using TmsApi.Data;
 using TmsApi.Services;
 using TmsApi.Filters;
+using TmsApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<V1DeprecationMiddleware>();
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
