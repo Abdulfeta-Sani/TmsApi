@@ -1,0 +1,23 @@
+Request
+-------
+GET /api/v2/courses
+
+Response
+--------
+Status: 200 OK
+
+Headers
+-------
+Api-Supported-Versions: 1.0, 2.0
+Content-Type: application/json; charset=utf-8
+Date: Thu, 16 Jul 2026 12:00:32 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+Verification
+------------
+✓ API version 2 is the current version.
+✓ No Deprecation header is present.
+✓ No Sunset header is present.
+✓ No successor Link header is present.
+✓ Supported API versions are reported.

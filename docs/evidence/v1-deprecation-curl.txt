@@ -1,0 +1,25 @@
+Request
+-------
+GET /api/v1/courses
+
+Response
+--------
+Status: 200 OK
+
+Headers
+-------
+Api-Supported-Versions: 1.0, 2.0
+Content-Type: application/json; charset=utf-8
+Date: Thu, 16 Jul 2026 11:58:35 GMT
+Deprecation: true
+Link: <http://localhost:5249/api/v2/courses>; rel="successor-version"
+Server: Kestrel
+Sunset: Thu, 31 Dec 2026 00:00:00 GMT
+Transfer-Encoding: chunked
+
+Verification
+------------
+✓ API version 1 is marked as deprecated.
+✓ Sunset date is advertised to clients.
+✓ Successor API version (v2) is provided through the Link header.
+✓ Supported API versions are reported.
