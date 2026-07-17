@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using TmsApi.Data;
+using TmsApi.Infrastructure.Persistence;
 using TmsApi.Services;
 using TmsApi.Filters;
 using TmsApi.Middleware;
