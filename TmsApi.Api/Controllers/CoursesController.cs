@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc;
-using TmsApi.Dtos;
-using TmsApi.Services;
+using Microsoft.AspNetCore.Routing;
+using TmsApi.Application.Dtos;
+using TmsApi.Application.Interfaces;
 
 namespace TmsApi.Controllers;
 

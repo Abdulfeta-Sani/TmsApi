@@ -1,19 +1,20 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TmsApi.Data;
+using TmsApi.Infrastructure.Persistence;
 
-namespace TmsApi.Controllers.V2;
+namespace TmsApi.Api.Controllers.V2;
 
 [ApiController]
 [Route("api/v{version:apiVersion}/courses")]
 [ApiVersion("2.0")]
-public class CoursesController(TmsDbContext context) : ControllerBase{
-[HttpGet]
-public async Task<IActionResult> GetCourses(
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 20,
-    CancellationToken ct = default)
+public class CoursesController(TmsDbContext context) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> GetCourses(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
 {
     page = Math.Max(1, page);
     pageSize = Math.Clamp(pageSize, 1, 50);

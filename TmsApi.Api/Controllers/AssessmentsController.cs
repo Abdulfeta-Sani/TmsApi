@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using TmsApi.Dtos;
-using TmsApi.Services;
+using TmsApi.Application.Dtos;
+using TmsApi.Application.Interfaces;
 
-namespace TmsApi.Controllers;
+
+namespace TmsApi.Api.Controllers;
 
 [ApiController]
 [Route("api/courses/{courseId:int}/assessments")]
