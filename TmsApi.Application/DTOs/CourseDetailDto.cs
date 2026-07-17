@@ -1,4 +1,4 @@
-namespace TmsApi.Dtos;
+namespace TmsApi.Application.Dtos;
 
 public record CourseDetailDto
 {

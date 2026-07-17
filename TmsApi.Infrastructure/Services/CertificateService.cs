@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TmsApi.Data;
-using TmsApi.Dtos;
-using TmsApi.Entities;
+using TmsApi.Infrastructure.Persistence;
+using TmsApi.Application.Dtos;
+using TmsApi.Domain.Entities;
+using TmsApi.Application.Interfaces;
+using Microsoft.Extensions.Logging;
 
-namespace TmsApi.Services;
+namespace TmsApi.Infrastructure.Services;
 
 public class CertificateService(
     TmsDbContext context,

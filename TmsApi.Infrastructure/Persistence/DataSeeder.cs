@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TmsApi.Entities;
+using TmsApi.Domain.Entities;
 
-namespace TmsApi.Data;
-
+namespace TmsApi.Infrastructure.Persistence;
 public static class DataSeeder
 {
     private static readonly (string RegistrationNumber, string Name, decimal GPA, bool IsActive)[] Students =

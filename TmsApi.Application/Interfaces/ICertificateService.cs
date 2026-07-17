@@ -1,7 +1,6 @@
-using TmsApi.Dtos;
+using TmsApi.Application.Dtos;
 
-namespace TmsApi.Services;
-
+namespace TmsApi.Application.Interfaces;
 public interface ICertificateService
 {
     Task<CertificateResponseDto?> GetByIdAsync(int id, CancellationToken ct);
