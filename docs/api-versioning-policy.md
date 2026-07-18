@@ -58,3 +58,11 @@ Clients may migrate directly between supported versions.
 For example, a client using **V1** may upgrade directly to **V3** without first adopting **V2**.
 
 Clients are never required to upgrade through every intermediate version.
+
+## Optional Header-Based Versioning
+
+The TMS API primarily uses URL-segment versioning (for example, `/api/v1/courses`) because it is explicit, easy to troubleshoot, and simplifies incident response.
+
+For specific integration partners that cannot easily change cached URLs (such as certain mobile or CDN-based clients), the API also supports the `X-Api-Version` request header as an alternative version reader.
+
+Header-based versioning is an opt-in compatibility feature and is not the default versioning strategy.
