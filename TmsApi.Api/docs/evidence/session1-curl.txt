@@ -1,0 +1,68 @@
+# Module 7 – Session 1
+
+## Versioning Cross-Check Evidence
+
+---
+
+# Test 1 – GET /api/v1/courses
+
+## Command
+
+```bash
+curl -i http://localhost:5249/api/v1/courses
+```
+
+## Response Headers
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+api-supported-versions: 1.0, 2.0
+
+Deprecation: true
+Sunset: Thu, 31 Dec 2026 00:00:00 GMT
+Link: <http://localhost:5249/api/v2/courses>; rel="successor-version"
+```
+
+### Verification
+
+✓ V1 endpoint responds successfully.
+✓ Deprecation header present.
+✓ Sunset header present.
+✓ Successor-version Link header present.
+
+---
+
+# Test 2 – GET /api/v2/courses
+
+## Command
+
+```bash
+curl -i http://localhost:5249/api/v2/courses
+```
+
+## Response Headers
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+api-supported-versions: 1.0, 2.0
+```
+
+### Verification
+
+✓ V2 endpoint responds successfully.
+✓ No Deprecation header.
+✓ No Sunset header.
+✓ No successor Link header.
+
+---
+
+# Conclusion
+
+The API versioning middleware behaves as expected.
+
+* V1 endpoints are marked as deprecated.
+* V2 endpoints are the current supported version.
+* Deprecation headers are only returned for V1.
+* V2 exposes the new response contract (`data`, `meta`, `links`) with no deprecation metadata.
