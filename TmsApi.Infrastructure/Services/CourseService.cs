@@ -46,8 +46,8 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger) 
     }
 
     public async Task<Course?> GetByCodeAsync(
-    string courseCode,
-    CancellationToken ct)
+        string courseCode,
+        CancellationToken ct)
     {
         return await context.Courses
             .Include(c => c.Enrollments)
@@ -96,5 +96,14 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger) 
             Page = request.Page,
             PageSize = request.PageSize
         };
+    }
+
+    public async Task<IReadOnlyList<Course>> GetAllAsync(
+    CancellationToken ct)
+    {
+        return await context.Courses
+            .Include(c => c.Enrollments)
+            .AsNoTracking()
+            .ToListAsync(ct);
     }
 }

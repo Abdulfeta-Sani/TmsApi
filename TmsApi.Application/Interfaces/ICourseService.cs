@@ -24,4 +24,8 @@ public interface ICourseService
     Task<Course?> GetByCodeAsync(
         string courseCode,
         CancellationToken ct);
+
+    Task<IReadOnlyList<Course>> GetAllAsync(
+    CancellationToken ct);
+    
 }
