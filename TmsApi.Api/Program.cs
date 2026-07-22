@@ -11,6 +11,7 @@ using TmsApi.Api.Middlewares;
 using TmsApi.Api.ExceptionHandlers;
 using TmsApi.Application.Behaviors;
 using TmsApi.Application.Enrollments.Commands;
+using Microsoft.Extensions.Caching.Hybrid;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +64,23 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<AuditLogFilter>();
 });
+
+builder.Services.AddHybridCache(options =>
+{
+    options.DefaultEntryOptions = new HybridCacheEntryOptions
+    {
+        Expiration = TimeSpan.FromMinutes(10),
+        LocalCacheExpiration = TimeSpan.FromMinutes(2)
+    };
+});
+
+// Production-only leave commented in lab
+// builder.Services.AddStackExchangeRedisCache(options =>
+// {
+// options.Configuration = builder.Configuration.GetConnectionString("Redis");
+// options.InstanceName = "tms:";
+// });
+// builder.Services.AddHybridCache();
 
 var app = builder.Build();
 
