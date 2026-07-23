@@ -8,7 +8,8 @@ public interface ICachedCourseService
         string code,
         CancellationToken ct);
 
-    Task<List<CourseResponseDto>> GetAllCoursesAsync(
+    Task<PagedResponse<CourseResponseDto>> GetCoursesAsync(
+        PagedRequest request,
         CancellationToken ct);
 
     Task InvalidateCourseCacheAsync(

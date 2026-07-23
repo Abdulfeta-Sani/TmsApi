@@ -58,16 +58,17 @@ public class CachedCourseService(
         return dto;
     }
 
-    public async Task<List<CourseResponseDto>> GetAllCoursesAsync(
+    public async Task<PagedResponse<CourseResponseDto>> GetCoursesAsync(
+        PagedRequest request,
         CancellationToken ct)
     {
-        var key = CacheKeys.CoursesAll;
+        var key = $"{CacheKeys.CoursesAll}:{request.Page}:{request.PageSize}:{request.Search}:{request.OrderBy}:{request.Descending}";
 
         var dbHit = false;
 
-        var list = await cache.GetOrCreateAsync(
+        var result = await cache.GetOrCreateAsync(
             key,
-            service,
+            (service, request),
             async (state, token) =>
             {
                 dbHit = true;
@@ -76,16 +77,9 @@ public class CachedCourseService(
                     "Cache MISS for {Key} fetching from DB",
                     key);
 
-                var courses = await state.GetAllAsync(token);
-
-                return courses
-                    .Select(c => new CourseResponseDto(
-                        c.Id,
-                        c.Code,
-                        c.Title,
-                        c.MaxCapacity,
-                        c.Enrollments.Count))
-                    .ToList();
+                return await state.service.GetCoursesAsync(
+                    state.request,
+                    token);
             },
             tags: [CacheKeys.CoursesTag],
             cancellationToken: ct);
@@ -97,8 +91,9 @@ public class CachedCourseService(
                 key);
         }
 
-        return list;
+        return result;
     }
+
 
     public async Task InvalidateCourseCacheAsync(
         CancellationToken ct)
