@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TmsApi.Infrastructure.Services;
 
-public class CourseService(TmsDbContext context, ILogger<CourseService> logger) : ICourseService
+public class CourseService(TmsDbContext context, ILogger<CourseService> logger, ICachedCourseService cachedCourseService) : ICourseService
 {
     public Task<CourseResponseDto?> GetByIdAsync(int id, CancellationToken ct) => context.Courses
             .AsNoTracking()
@@ -32,6 +32,7 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger) 
         context.Courses.Add(course);
 
         await context.SaveChangesAsync(ct);
+        await cachedCourseService.InvalidateCourseCacheAsync(ct);
 
         logger.LogInformation("Created course {CourseId} ({Code})", course.Id, course.Code);
 
