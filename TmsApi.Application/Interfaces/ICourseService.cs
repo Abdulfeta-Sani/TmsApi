@@ -28,4 +28,14 @@ public interface ICourseService
     Task<IReadOnlyList<Course>> GetAllAsync(
     CancellationToken ct);
     
+    Task<bool> UpdateAsync(
+        int id,
+        string code,
+        string title,
+        int maxCapacity,
+        CancellationToken ct);
+
+    Task<bool> DeleteAsync(
+        int id,
+        CancellationToken ct);
 }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TmsApi.Infrastructure.Services;
 
-public class CourseService(TmsDbContext context, ILogger<CourseService> logger, ICachedCourseService cachedCourseService) : ICourseService
+public class CourseService(TmsDbContext context, ILogger<CourseService> logger) : ICourseService
 {
     public Task<CourseResponseDto?> GetByIdAsync(int id, CancellationToken ct) => context.Courses
             .AsNoTracking()
@@ -32,7 +32,6 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger, 
         context.Courses.Add(course);
 
         await context.SaveChangesAsync(ct);
-        await cachedCourseService.InvalidateCourseCacheAsync(ct);
 
         logger.LogInformation("Created course {CourseId} ({Code})", course.Id, course.Code);
 
@@ -106,5 +105,60 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger, 
             .Include(c => c.Enrollments)
             .AsNoTracking()
             .ToListAsync(ct);
+    }
+
+
+    public async Task<bool> UpdateAsync(
+        int id,
+        string code,
+        string title,
+        int maxCapacity,
+        CancellationToken ct)
+    {
+        var codeAlreadyExists = await context.Courses
+            .AsNoTracking()
+            .AnyAsync(c => c.Code == code && c.Id != id, ct);
+
+        if (codeAlreadyExists)
+        {
+            return false;
+        }
+
+        var course = await context.Courses
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+
+        if (course is null)
+        {
+            return false;
+        }
+
+        course.Code = code;
+        course.Title = title;
+        course.MaxCapacity = maxCapacity;
+
+        await context.SaveChangesAsync(ct);
+
+        logger.LogInformation("Updated course {CourseId} ({Code})", course.Id, course.Code);
+
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(int id, CancellationToken ct)
+    {
+        var course = await context.Courses
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+
+        if (course is null)
+        {
+            return false;
+        }
+
+        context.Courses.Remove(course);
+
+        await context.SaveChangesAsync(ct);
+
+        logger.LogInformation("Deleted course {CourseId} ({Code})", course.Id, course.Code);
+
+        return true;
     }
 }
