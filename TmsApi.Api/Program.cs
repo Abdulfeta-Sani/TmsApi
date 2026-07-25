@@ -160,6 +160,8 @@ builder.Services.AddRateLimiter(options =>
 // });
 // builder.Services.AddHybridCache();
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -190,4 +192,7 @@ if (app.Environment.IsDevelopment())
     var context = scope.ServiceProvider.GetRequiredService<TmsDbContext>();
     await DataSeeder.SeedAsync(context);
 }
+// Exercise 9 will introduces The health check endpoints
+app.MapHealthChecks("/health/live").DisableRateLimiting();
+app.MapHealthChecks("/health/ready").DisableRateLimiting();
 app.Run();
