@@ -150,6 +150,14 @@ builder.Services.AddRateLimiter(options =>
         opt.QueueLimit = 20; // queue next 20
         opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
+
+    options.AddTokenBucketLimiter("search", opt =>
+    {
+        opt.TokenLimit = 10;
+        opt.TokensPerPeriod = 5;
+        opt.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+        opt.QueueLimit = 2;
+    });
 });
 
 // Production-only leave commented in lab
