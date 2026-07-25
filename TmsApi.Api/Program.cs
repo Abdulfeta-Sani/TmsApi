@@ -143,6 +143,13 @@ builder.Services.AddRateLimiter(options =>
             Type = "https://tms.local/errors/rate_limit_exceeded"
         }, ct);
     };
+
+    options.AddConcurrencyLimiter("transcripts", opt =>
+    {
+        opt.PermitLimit = 5; // max in-flight transcript requests
+        opt.QueueLimit = 20; // queue next 20
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
 });
 
 // Production-only leave commented in lab
