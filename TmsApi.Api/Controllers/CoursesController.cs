@@ -2,6 +2,7 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.RateLimiting;
 using TmsApi.Application.Courses.Commands;
 using TmsApi.Application.Courses.Queries;
 using TmsApi.Application.Dtos;
@@ -165,5 +166,15 @@ public class CoursesController(
         }
 
         return NoContent();
+    }
+
+    [HttpGet("search")]
+    [EnableRateLimiting("search")]
+    public async Task<IActionResult> SearchCourses(
+        [FromQuery] string? term,
+        CancellationToken ct)
+    {
+        var results = await mediator.Send(new SearchCoursesQuery(term), ct);
+        return Ok(results);
     }
 }
