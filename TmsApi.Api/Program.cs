@@ -70,6 +70,14 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<AuditLogFilter>();
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddHybridCache(options =>
 {
     options.DefaultEntryOptions = new HybridCacheEntryOptions
@@ -191,6 +199,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<V1DeprecationMiddleware>();
+app.UseCors("AllowAngular");
 app.UseRateLimiter();
 app.MapControllers();
 
