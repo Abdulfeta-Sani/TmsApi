@@ -4,6 +4,7 @@ using TmsApi.Application.Dtos;
 using TmsApi.Domain.Entities;
 using TmsApi.Application.Interfaces;
 using Microsoft.Extensions.Logging;
+using TmsApi.Application.Enrollments.Queries;
 
 namespace TmsApi.Infrastructure.Services;
 
@@ -96,5 +97,38 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
             .Include(e => e.Course)
             .Where(e => e.StudentId == studentId)
             .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<EnrollmentListItemDto>> GetAllAsync(CancellationToken ct)
+    {
+        return await context.Enrollments
+            .AsNoTracking()
+            .Include(e => e.Student)
+            .Include(e => e.Course)
+            .Select(e => new EnrollmentListItemDto(
+                e.Id,
+                e.StudentId,
+                e.Student.Name,
+                e.CourseId,
+                e.Course.Title,
+                e.EnrolledAt))
+            .ToListAsync(ct);
+    }
+
+    public async Task<EnrollmentListItemDto?> GetByIdAsync(int id, CancellationToken ct)
+    {
+        return await context.Enrollments
+            .AsNoTracking()
+            .Include(e => e.Student)
+            .Include(e => e.Course)
+            .Where(e => e.Id == id)
+            .Select(e => new EnrollmentListItemDto(
+                e.Id,
+                e.StudentId,
+                e.Student.Name,
+                e.CourseId,
+                e.Course.Title,
+                e.EnrolledAt))
+            .FirstOrDefaultAsync(ct);
     }
 }

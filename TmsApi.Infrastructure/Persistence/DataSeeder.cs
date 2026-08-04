@@ -46,6 +46,19 @@ public static class DataSeeder
         ("UX-201", "Design Systems and Tokens", 22),
     ];
 
+    private static readonly (string StudentRegistrationNumber, string CourseCode)[] Enrollments =
+    [
+        ("TMS-2026-0001", "CSE-101"),
+        ("TMS-2026-0002", "CSE-102"),
+        ("TMS-2026-0004", "CSE-201"),
+        ("TMS-2026-0006", "CSE-203"),
+        ("TMS-2026-0008", "CSE-302"),
+        ("TMS-2026-0010", "CSE-304"),
+        ("TMS-2026-0003", "CSE-101"),
+        ("TMS-2026-0005", "CSE-102"),
+        ("TMS-2026-0007", "CSE-101")
+    ];
+
     public static async Task SeedAsync(TmsDbContext context, CancellationToken ct = default)
     {
         // Apply any pending EF Core migrations.
@@ -76,6 +89,25 @@ public static class DataSeeder
                     Code = code,
                     Title = title,
                     MaxCapacity = maxCapacity
+                });
+            }
+        }
+
+        if (!await context.Enrollments.AnyAsync(ct))
+        {
+            foreach (var (studentRegistrationNumber, courseCode) in Enrollments)
+            {
+                var student = await context.Students
+                    .FirstAsync(s => s.RegistrationNumber == studentRegistrationNumber, ct);
+
+                var course = await context.Courses
+                    .FirstAsync(c => c.Code == courseCode, ct);
+
+                context.Enrollments.Add(new Enrollment
+                {
+                    StudentId = student.Id,
+                    CourseId = course.Id,
+                    EnrolledAt = DateTime.UtcNow
                 });
             }
         }
