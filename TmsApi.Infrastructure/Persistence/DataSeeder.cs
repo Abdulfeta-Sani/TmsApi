@@ -61,10 +61,8 @@ public static class DataSeeder
 
     public static async Task SeedAsync(TmsDbContext context, CancellationToken ct = default)
     {
-        // Apply any pending EF Core migrations.
         await context.Database.MigrateAsync(ct);
 
-        // Seed Students only if none exist.
         if (!await context.Students.AnyAsync(ct))
         {
             foreach (var (registrationNumber, name, gpa, isActive) in Students)
@@ -77,9 +75,10 @@ public static class DataSeeder
                     IsActive = isActive
                 });
             }
+
+            await context.SaveChangesAsync(ct);
         }
 
-        // Seed Courses only if none exist.
         if (!await context.Courses.AnyAsync(ct))
         {
             foreach (var (code, title, maxCapacity) in Courses)
@@ -91,6 +90,8 @@ public static class DataSeeder
                     MaxCapacity = maxCapacity
                 });
             }
+
+            await context.SaveChangesAsync(ct);
         }
 
         if (!await context.Enrollments.AnyAsync(ct))
@@ -110,9 +111,8 @@ public static class DataSeeder
                     EnrolledAt = DateTime.UtcNow
                 });
             }
-        }
 
-        // Persist everything with one database call.
-        await context.SaveChangesAsync(ct);
+            await context.SaveChangesAsync(ct);
+        }
     }
 }
