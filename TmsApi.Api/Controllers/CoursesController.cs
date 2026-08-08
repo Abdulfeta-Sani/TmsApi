@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -12,7 +11,6 @@ namespace TmsApi.Api.Controllers;
 
 [ApiController]
 [Route("api/v{version:apiVersion}/courses")]
-[ApiVersion("2.0")]
 [Tags("Courses")]
 [Produces("application/json")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
