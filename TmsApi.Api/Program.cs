@@ -21,6 +21,8 @@ using System.Threading.Channels;
 using TmsApi.Application.Transcripts;
 using TmsApi.Infrastructure.Workers;
 using TmsApi.Api.Hubs;
+using TmsApi.Application.Notifications;
+using TmsApi.Api.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -190,6 +192,7 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddHealthChecks();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<ITranscriptNotificationService, SignalRTranscriptNotificationService>();
 
 var app = builder.Build();
 
