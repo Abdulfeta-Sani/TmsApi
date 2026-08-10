@@ -20,6 +20,7 @@ using TmsApi.Infrastructure.Transcripts;
 using System.Threading.Channels;
 using TmsApi.Application.Transcripts;
 using TmsApi.Infrastructure.Workers;
+using TmsApi.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -188,9 +189,11 @@ builder.Services.AddRateLimiter(options =>
 // builder.Services.AddHybridCache();
 
 builder.Services.AddHealthChecks();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
+app.MapHub<TmsHub>("/hubs/tms");
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 if (app.Environment.IsDevelopment())
