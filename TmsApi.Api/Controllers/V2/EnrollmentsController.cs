@@ -1,12 +1,20 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using TmsApi.Api.Hubs;
 using TmsApi.Application.Enrollments.Commands;
 using TmsApi.Application.Enrollments.Queries;
+using TmsApi.Application.Hubs;
+
+namespace TmsApi.Api.Controllers.V2;
+
 [ApiController]
 [Route("api/v{version:apiVersion}/enrollments")]
 [ApiVersion("2.0")]
-public class EnrollmentsController(IMediator mediator) : ControllerBase
+public class EnrollmentsController(
+    IMediator mediator,
+    IHubContext<TmsHub, ITmsHubClient> hubContext) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Enroll(
@@ -31,6 +39,17 @@ public class EnrollmentsController(IMediator mediator) : ControllerBase
                     detail: error.Message,
                     type: $"https://tms.local/errors/{error.Code}");
             });
+    }
+
+    // add temporary enrollment approval broadcast endpoint b/c the enrollment status in the domain model is not yet implemented
+    [HttpPost("{id}/approve")]
+    public async Task<IActionResult> Approve(string id, CancellationToken ct)
+    {
+        await hubContext.Clients.All.ReceiveEnrollmentStatusUpdated(
+            id,
+            "Approved");
+
+        return NoContent();
     }
 
     [HttpGet("{studentId}/schedule")]
