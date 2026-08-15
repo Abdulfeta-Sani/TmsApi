@@ -84,12 +84,20 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<AuditLogFilter>();
 });
 
+var allowedOrigins = builder.Configuration
+    .GetSection("AllowedOrigins")
+    .Get<string[]>() ?? ["http://localhost:4200"];
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular", policy =>
-        policy.WithOrigins("http://localhost:4200")
+    options.AddPolicy("TmsClient", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials()
+              .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+    });
 });
 
 builder.Services.AddHybridCache(options =>
@@ -216,7 +224,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<V1DeprecationMiddleware>();
-app.UseCors("AllowAngular");
+app.UseCors("TmsClient");
 app.UseRateLimiter();
 app.MapControllers();
 
