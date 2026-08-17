@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using TmsApi.Application.Dtos.Auth;
+using Asp.Versioning;
 
 namespace TmsApi.Api.Controllers;
 
 [ApiController]
-[Route("api/{version:apiVersion}/auth")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/auth")]
 public class AuthController : ControllerBase
 {
     [HttpPost("login")]
