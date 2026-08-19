@@ -209,7 +209,7 @@ builder.Services.AddSingleton<ITranscriptNotificationService, SignalRTranscriptN
 
 var app = builder.Build();
 
-app.MapHub<TmsHub>("/hubs/tms");
+app.MapHub<TmsHub>("/hubs/tms").RequireCors("TmsClient");
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 if (app.Environment.IsDevelopment())
