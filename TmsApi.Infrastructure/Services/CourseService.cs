@@ -161,4 +161,12 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger) 
 
         return true;
     }
+
+    public Task<Course?> GetEntityByIdAsync(
+        int id,
+        CancellationToken ct)
+    {
+        return context.Courses
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+    }
 }

@@ -3,22 +3,23 @@ using TmsApi.Domain.Entities;
 
 
 namespace TmsApi.Application.Interfaces;
+
 public interface ICourseService
 {
     Task<CourseResponseDto?> GetByIdAsync(
-        int id, 
+        int id,
         CancellationToken ct);
 
     Task<CourseResponseDto> CreateAsync(
-        CreateCourseRequest request, 
+        CreateCourseRequest request,
         CancellationToken ct);
 
     Task<bool> CodeExistsAsync(
-        string code, 
+        string code,
         CancellationToken ct);
 
     Task<PagedResponse<CourseResponseDto>> GetCoursesAsync(
-        PagedRequest request, 
+        PagedRequest request,
         CancellationToken ct);
 
     Task<Course?> GetByCodeAsync(
@@ -27,7 +28,7 @@ public interface ICourseService
 
     Task<IReadOnlyList<Course>> GetAllAsync(
     CancellationToken ct);
-    
+
     Task<bool> UpdateAsync(
         int id,
         string code,
@@ -36,6 +37,10 @@ public interface ICourseService
         CancellationToken ct);
 
     Task<bool> DeleteAsync(
+        int id,
+        CancellationToken ct);
+
+    Task<Course?> GetEntityByIdAsync(
         int id,
         CancellationToken ct);
 }

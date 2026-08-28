@@ -6,9 +6,11 @@ using TmsApi.Application.Courses.Commands;
 using TmsApi.Application.Courses.Queries;
 using TmsApi.Application.Dtos;
 using TmsApi.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TmsApi.Api.Controllers;
 
+[Authorize(Roles = "Instructor,Admin")]
 [ApiController]
 [Route("api/v{version:apiVersion}/courses")]
 [Tags("Courses")]
@@ -17,7 +19,8 @@ namespace TmsApi.Api.Controllers;
 public class CoursesController(
     IMediator mediator,
     ICourseService courseService,
-    LinkGenerator linkGenerator) : ControllerBase
+    LinkGenerator linkGenerator,
+    IAuthorizationService authorizationService) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<CourseResponseDto>), StatusCodes.Status200OK)]
@@ -114,13 +117,31 @@ public class CoursesController(
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Update an existing course")]
-    [EndpointDescription("Updates a course by ID. Returns 404 if the course does not exist and 409 if the new code conflicts with another course.")]
+    [EndpointDescription("Updates a course by ID. Returns 404 if the course does not exist, 403 if the caller is not authorized, and 409 if the new code conflicts with another course.")]
     public async Task<IActionResult> UpdateCourse(
         int id,
         [FromBody] UpdateCourseRequest request,
         CancellationToken ct)
     {
+        var course = await courseService.GetEntityByIdAsync(id, ct);
+
+        if (course is null)
+        {
+            return NotFound();
+        }
+
+        var authResult = await authorizationService.AuthorizeAsync(
+            User,
+            course,
+            "CanEditCourse");
+
+        if (!authResult.Succeeded)
+        {
+            return Forbid();
+        }
+
         var updated = await mediator.Send(
             new UpdateCourseCommand(
                 id,
@@ -131,13 +152,6 @@ public class CoursesController(
 
         if (!updated)
         {
-            var courseExists = await courseService.GetByIdAsync(id, ct);
-
-            if (courseExists is null)
-            {
-                return NotFound();
-            }
-
             return Conflict(new ProblemDetails
             {
                 Title = "Course code already exists",
