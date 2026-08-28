@@ -245,6 +245,13 @@ builder.Services.AddRateLimiter(options =>
         opt.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
         opt.QueueLimit = 2;
     });
+
+    options.AddFixedWindowLimiter("AuthLimiter", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
 });
 
 // Production-only leave commented in lab
@@ -260,6 +267,28 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<ITranscriptNotificationService, SignalRTranscriptNotificationService>();
 
 var app = builder.Build();
+
+// Security headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append(
+        "X-Content-Type-Options",
+        "nosniff");
+
+    context.Response.Headers.Append(
+        "X-Frame-Options",
+        "DENY");
+
+    context.Response.Headers.Append(
+        "Referrer-Policy",
+        "strict-origin-when-cross-origin");
+
+    context.Response.Headers.Append(
+        "Content-Security-Policy",
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';");
+
+    await next();
+});
 
 app.MapHub<TmsHub>("/hubs/tms").RequireCors("TmsClient");
 app.UseExceptionHandler();
