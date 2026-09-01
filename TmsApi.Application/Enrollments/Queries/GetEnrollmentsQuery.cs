@@ -14,4 +14,5 @@ public record EnrollmentListItemDto(
     string StudentName,
     int CourseId,
     string CourseName,
-    DateTime EnrolledAt);
+    DateTime EnrolledAt,
+    string Status);

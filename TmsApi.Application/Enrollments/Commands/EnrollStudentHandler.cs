@@ -39,7 +39,8 @@ public class EnrollStudentHandler(
         {
             StudentId = command.StudentId,
             CourseId = course.Id,
-            EnrolledAt = DateTime.UtcNow
+            EnrolledAt = DateTime.UtcNow,
+            Status = EnrollmentStatus.Pending
         };
 
         await enrollmentService.AddAsync(enrollment, ct);

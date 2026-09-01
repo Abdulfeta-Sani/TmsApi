@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TmsApi.Domain.Entities;
 
 namespace TmsApi.Infrastructure.Persistence.Configurations;
+
 public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
 {
     public void Configure(EntityTypeBuilder<Enrollment> builder)
@@ -13,6 +14,12 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
             .IsRequired();
 
         builder.Property(e => e.CourseId)
+            .IsRequired();
+
+        builder.Property(e => e.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(EnrollmentStatus.Pending)
             .IsRequired();
 
         // Prevent deleting a student if there are enrollments associated with it

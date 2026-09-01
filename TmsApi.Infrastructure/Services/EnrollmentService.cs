@@ -22,7 +22,8 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
                     e.Id,
                     e.CourseId,
                     e.StudentId,
-                    e.EnrolledAt))
+                    e.EnrolledAt,
+                    e.Status.ToString()))
             .FirstOrDefaultAsync(ct);
 
     public async Task<IReadOnlyList<EnrollmentResponseDto>> GetByCourseAsync(int courseId, CancellationToken ct)
@@ -34,7 +35,8 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
                 e.Id,
                 e.CourseId,
                 e.StudentId,
-                e.EnrolledAt))
+                e.EnrolledAt,
+                e.Status.ToString()))
             .ToListAsync(ct);
     }
 
@@ -44,7 +46,8 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
         {
             CourseId = courseId,
             StudentId = request.StudentId,
-            EnrolledAt = DateTime.UtcNow
+            EnrolledAt = DateTime.UtcNow,
+            Status = EnrollmentStatus.Pending
         };
 
         context.Enrollments.Add(enrollment);
@@ -111,7 +114,8 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
                 e.Student.Name,
                 e.CourseId,
                 e.Course.Title,
-                e.EnrolledAt))
+                e.EnrolledAt,
+                e.Status.ToString()))
             .ToListAsync(ct);
     }
 
@@ -128,7 +132,8 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
                 e.Student.Name,
                 e.CourseId,
                 e.Course.Title,
-                e.EnrolledAt))
+                e.EnrolledAt,
+                e.Status.ToString()))
             .FirstOrDefaultAsync(ct);
     }
 }
