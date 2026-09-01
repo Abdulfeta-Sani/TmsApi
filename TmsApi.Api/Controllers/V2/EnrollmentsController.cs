@@ -6,6 +6,8 @@ using TmsApi.Api.Hubs;
 using TmsApi.Application.Enrollments.Commands;
 using TmsApi.Application.Enrollments.Queries;
 using TmsApi.Application.Hubs;
+using TmsApi.Application.Interfaces;
+using TmsApi.Domain.Entities;
 
 namespace TmsApi.Api.Controllers.V2;
 
@@ -14,6 +16,7 @@ namespace TmsApi.Api.Controllers.V2;
 [ApiVersion("2.0")]
 public class EnrollmentsController(
     IMediator mediator,
+    IEnrollmentService enrollmentService,
     IHubContext<TmsHub, ITmsHubClient> hubContext) : ControllerBase
 {
     [HttpPost]
@@ -41,13 +44,27 @@ public class EnrollmentsController(
             });
     }
 
-    // add temporary enrollment approval broadcast endpoint b/c the enrollment status in the domain model is not yet implemented
-    [HttpPost("{id}/approve")]
-    public async Task<IActionResult> Approve(string id, CancellationToken ct)
+    [HttpPost("{id:int}/approve")]
+    public async Task<IActionResult> Approve(int id, CancellationToken ct)
     {
-        await hubContext.Clients.All.ReceiveEnrollmentStatusUpdated(
+        var updated = await enrollmentService.UpdateStatusAsync(
             id,
-            "Approved");
+            EnrollmentStatus.Approved,
+            ct);
+
+        if (!updated)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Enrollment not found",
+                Detail = $"Enrollment {id} was not found.",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        await hubContext.Clients.All.ReceiveEnrollmentStatusUpdated(
+            id.ToString(),
+            EnrollmentStatus.Approved.ToString());
 
         return NoContent();
     }

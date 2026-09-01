@@ -136,4 +136,28 @@ public class EnrollmentService(TmsDbContext context, ILogger<EnrollmentService> 
                 e.Status.ToString()))
             .FirstOrDefaultAsync(ct);
     }
+
+    public async Task<bool> UpdateStatusAsync(
+        int enrollmentId,
+        EnrollmentStatus status,
+        CancellationToken ct)
+    {
+        var enrollment = await context.Enrollments
+            .FirstOrDefaultAsync(e => e.Id == enrollmentId, ct);
+
+        if (enrollment is null)
+        {
+            return false;
+        }
+
+        enrollment.Status = status;
+        await context.SaveChangesAsync(ct);
+
+        logger.LogInformation(
+            "Enrollment {EnrollmentId} status changed to {Status}",
+            enrollmentId,
+            status);
+
+        return true;
+    }
 }
