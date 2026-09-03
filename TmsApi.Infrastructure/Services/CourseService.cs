@@ -4,6 +4,7 @@ using TmsApi.Application.Dtos;
 using TmsApi.Domain.Entities;
 using TmsApi.Application.Interfaces;
 using Microsoft.Extensions.Logging;
+using TmsApi.Application.Courses.Commands;
 
 namespace TmsApi.Infrastructure.Services;
 
@@ -143,14 +144,22 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger) 
         return true;
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken ct)
+    public async Task<CourseDeletionResult> DeleteAsync(int id, CancellationToken ct)
     {
         var course = await context.Courses
             .FirstOrDefaultAsync(c => c.Id == id, ct);
 
         if (course is null)
         {
-            return false;
+            return CourseDeletionResult.NotFound;
+        }
+
+        var hasEnrollments = await context.Enrollments
+            .AnyAsync(enrollment => enrollment.CourseId == id, ct);
+
+        if (hasEnrollments)
+        {
+            return CourseDeletionResult.HasEnrollments;
         }
 
         context.Courses.Remove(course);
@@ -159,7 +168,7 @@ public class CourseService(TmsDbContext context, ILogger<CourseService> logger) 
 
         logger.LogInformation("Deleted course {CourseId} ({Code})", course.Id, course.Code);
 
-        return true;
+        return CourseDeletionResult.Deleted;
     }
 
     public Task<Course?> GetEntityByIdAsync(

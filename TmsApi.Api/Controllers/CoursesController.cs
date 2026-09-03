@@ -166,18 +166,30 @@ public class CoursesController(
     [HttpDelete("{id:int}", Name = nameof(DeleteCourse))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [EndpointSummary("Delete a course")]
-    [EndpointDescription("Deletes a course by ID. Returns 404 if the course does not exist.")]
+    [EndpointDescription(
+        "Deletes a course by ID. Returns 404 if the course does not exist or 409 if enrollment records prevent deletion."
+    )]
     public async Task<IActionResult> DeleteCourse(int id, CancellationToken ct)
     {
-        var deleted = await mediator.Send(new DeleteCourseCommand(id), ct);
+        var result = await mediator.Send(new DeleteCourseCommand(id), ct);
 
-        if (!deleted)
+        return result switch
         {
-            return NotFound();
-        }
+            CourseDeletionResult.Deleted => NoContent(),
 
-        return NoContent();
+            CourseDeletionResult.NotFound => NotFound(),
+
+            CourseDeletionResult.HasEnrollments => Conflict(new ProblemDetails
+            {
+                Title = "Course cannot be deleted",
+                Detail = "Cannot delete course because enrollment records exist.",
+                Status = StatusCodes.Status409Conflict
+            }),
+
+            _ => Problem(statusCode: StatusCodes.Status500InternalServerError)
+        };
     }
 
     [HttpGet("search")]

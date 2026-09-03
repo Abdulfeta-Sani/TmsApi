@@ -6,21 +6,19 @@ namespace TmsApi.Application.Courses.Commands;
 public class DeleteCourseHandler(
     ICourseService courseService,
     ICachedCourseService cachedCourseService)
-    : IRequestHandler<DeleteCourseCommand, bool>
+    : IRequestHandler<DeleteCourseCommand, CourseDeletionResult>
 {
-    public async Task<bool> Handle(
+    public async Task<CourseDeletionResult> Handle(
         DeleteCourseCommand command,
         CancellationToken ct)
     {
-        var deleted = await courseService.DeleteAsync(command.Id, ct);
+        var result = await courseService.DeleteAsync(command.Id, ct);
 
-        if (!deleted)
+        if (result == CourseDeletionResult.Deleted)
         {
-            return false;
+            await cachedCourseService.InvalidateCourseCacheAsync(ct);
         }
 
-        await cachedCourseService.InvalidateCourseCacheAsync(ct);
-
-        return true;
+        return result;
     }
 }

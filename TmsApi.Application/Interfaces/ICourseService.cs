@@ -1,5 +1,6 @@
 using TmsApi.Application.Dtos;
 using TmsApi.Domain.Entities;
+using TmsApi.Application.Courses.Commands;
 
 
 namespace TmsApi.Application.Interfaces;
@@ -36,7 +37,7 @@ public interface ICourseService
         int maxCapacity,
         CancellationToken ct);
 
-    Task<bool> DeleteAsync(
+    Task<CourseDeletionResult> DeleteAsync(
         int id,
         CancellationToken ct);
 
