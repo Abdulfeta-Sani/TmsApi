@@ -8,21 +8,51 @@ using TmsApi.Application.Enrollments.Queries;
 using TmsApi.Application.Hubs;
 using TmsApi.Application.Interfaces;
 using TmsApi.Domain.Entities;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TmsApi.Api.Controllers.V2;
 
 [ApiController]
 [Route("api/v{version:apiVersion}/enrollments")]
 [ApiVersion("2.0")]
+[Authorize(Roles = "Student,Admin")]
 public class EnrollmentsController(
     IMediator mediator,
     IEnrollmentService enrollmentService,
+    IStudentService studentService,
     IHubContext<TmsHub, ITmsHubClient> hubContext) : ControllerBase
 {
+    public record EnrollRequest(string CourseCode);
+
     [HttpPost]
     public async Task<IActionResult> Enroll(
-    EnrollStudentCommand command, CancellationToken ct)
+        [FromBody] EnrollRequest request,
+        CancellationToken ct)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+
+        var studentId = await studentService.GetIdByUserIdAsync(userId, ct);
+
+        if (studentId is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Student profile not found",
+                Detail = "The authenticated user is not linked to a student profile.",
+                Status = StatusCodes.Status404NotFound
+            });
+        }
+
+        var command = new EnrollStudentCommand(
+            studentId.Value,
+            request.CourseCode);
+
         var result = await mediator.Send(command, ct);
         return result.Match<IActionResult>(onSuccess: created => CreatedAtAction(
             nameof(GetSchedule),

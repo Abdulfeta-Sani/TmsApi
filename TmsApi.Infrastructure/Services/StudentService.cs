@@ -113,4 +113,15 @@ public class StudentService(
         };
     }
 
+    public Task<int?> GetIdByUserIdAsync(
+    string userId,
+    CancellationToken ct)
+    {
+        return context.Students
+            .AsNoTracking()
+            .Where(student => student.UserId == userId)
+            .Select(student => (int?)student.Id)
+            .FirstOrDefaultAsync(ct);
+    }
+
 }

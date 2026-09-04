@@ -1,6 +1,7 @@
 using TmsApi.Application.Dtos;
 
 namespace TmsApi.Application.Interfaces;
+
 public interface IStudentService
 {
     Task<StudentResponseDto?> GetByIdAsync(
@@ -15,4 +16,7 @@ public interface IStudentService
     Task<PagedResponse<StudentResponseDto>> GetStudentsAsync(
         PagedRequest request,
         CancellationToken ct);
+    Task<int?> GetIdByUserIdAsync(
+    string userId,
+    CancellationToken ct);
 }
