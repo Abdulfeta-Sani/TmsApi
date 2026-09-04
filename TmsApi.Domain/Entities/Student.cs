@@ -1,4 +1,5 @@
 namespace TmsApi.Domain.Entities;
+
 public class Student
 {
     public int Id { get; set; } // surrogate primary key — internal, used by foreign keys
@@ -8,6 +9,7 @@ public class Student
     public bool IsActive { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
     public uint Version { get; set; }
+    public string? UserId { get; set; }
 
     // Navigation property for many-to-many relationship
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();

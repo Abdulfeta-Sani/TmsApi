@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TmsApi.Domain.Entities;
 
 namespace TmsApi.Infrastructure.Persistence.Configurations;
+
 public class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
     public void Configure(EntityTypeBuilder<Student> builder)
@@ -22,6 +23,13 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 
         builder.Property(s => s.Version)
             .IsRowVersion();
+
+        builder.Property(s => s.UserId)
+            .HasMaxLength(450);
+
+        builder.HasIndex(s => s.UserId)
+            .IsUnique()
+            .HasFilter("\"UserId\" IS NOT NULL");
 
         builder.Property<DateTime>("LastUpdated")
             .HasColumnType("timestamp without time zone");
