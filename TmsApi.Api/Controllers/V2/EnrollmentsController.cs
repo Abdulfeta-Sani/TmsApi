@@ -16,7 +16,6 @@ namespace TmsApi.Api.Controllers.V2;
 [ApiController]
 [Route("api/v{version:apiVersion}/enrollments")]
 [ApiVersion("2.0")]
-[Authorize(Roles = "Student")]
 public class EnrollmentsController(
     IMediator mediator,
     IEnrollmentService enrollmentService,
@@ -25,6 +24,7 @@ public class EnrollmentsController(
 {
     public record EnrollRequest(string CourseCode);
 
+    [Authorize(Roles = "Student")]
     [HttpPost]
     public async Task<IActionResult> Enroll(
         [FromBody] EnrollRequest request,
@@ -74,6 +74,7 @@ public class EnrollmentsController(
             });
     }
 
+    [Authorize(Roles = "Instructor,Admin")]
     [HttpPost("{id:int}/approve")]
     public async Task<IActionResult> Approve(int id, CancellationToken ct)
     {
@@ -99,6 +100,7 @@ public class EnrollmentsController(
         return NoContent();
     }
 
+    [Authorize]
     [HttpGet("{studentId}/schedule")]
     public async Task<IActionResult> GetSchedule(
         int studentId, CancellationToken ct)
