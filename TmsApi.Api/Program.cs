@@ -346,3 +346,6 @@ if (app.Environment.IsDevelopment())
 app.MapHealthChecks("/health/live").DisableRateLimiting();
 app.MapHealthChecks("/health/ready").DisableRateLimiting();
 app.Run();
+public partial class Program
+{
+}
