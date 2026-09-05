@@ -16,7 +16,7 @@ namespace TmsApi.Api.Controllers.V2;
 [ApiController]
 [Route("api/v{version:apiVersion}/enrollments")]
 [ApiVersion("2.0")]
-[Authorize(Roles = "Student,Admin")]
+[Authorize(Roles = "Student")]
 public class EnrollmentsController(
     IMediator mediator,
     IEnrollmentService enrollmentService,
