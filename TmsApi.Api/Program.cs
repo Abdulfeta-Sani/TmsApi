@@ -31,6 +31,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TmsApi.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using TmsApi.Api.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -339,8 +340,15 @@ app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<TmsDbContext>();
+
+    var context =
+        scope.ServiceProvider.GetRequiredService<TmsDbContext>();
+
     await DataSeeder.SeedAsync(context);
+
+    await DevelopmentIdentitySeeder.SeedAsync(
+        scope.ServiceProvider,
+        app.Configuration);
 }
 
 app.MapHealthChecks("/health/live").DisableRateLimiting();
